@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Cleaning Tool</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      .container {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        text-align: center;
+        margin: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 400px;
+        height: 300px;
+      }
+
+      .drop-container {
+        border: 2px dashed #007bff;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        margin-right: 5px;
+        margin-top: 17px;
+        border-radius: 8px;
+        width: 300px;
+        height: 200px;
+      }
+
+      /* Style for file input label */
+      .file-input-label {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      /* Hide the default file input */
+      .file-input {
+        display: none;
+      }
+
+      button[type="submit"] {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 15px 30px;
+        border: none;
+        cursor: pointer;
+        border-radius: 10px;
+        margin-top: 20px;
+        align-self: center;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .container-left,
+      .container-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* Style for displaying selected file names */
+      .selected-files {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      form {
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Data Cleaning Tool</h1>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+      <div class="row">
+        <div class="container container-left">
+          <div class="drop-container" id="drop-container">
+            <p>Main file (All Data)</p>
+            <p>Drag and Drop file 1 here or</p>
+            <p>
+              <label class="file-input-label" for="file-input"
+                >click to select file 1</label
+              >
+            </p>
+            <input
+              type="file"
+              id="file-input"
+              name="file1"
+              class="file-input"
+              multiple
+            />
+            <div class="selected-files" id="selected-files1"></div>
+            <!-- Display selected file names for Container 1 -->
+          </div>
+        </div>
+        <br />
+
+        <div class="container container-right">
+          <div class="drop-container" id="drop-container2">
+            <p>This file email rows will be deleted from the Main file</p>
+            <p>Drag and Drop file 2 here or</p>
+            <p>
+              <label class="file-input-label" for="file-input2"
+                >click to select file 2</label
+              >
+            </p>
+            <input
+              type="file"
+              id="file-input2"
+              name="file2"
+              class="file-input"
+              multiple
+            />
+            <div class="selected-files" id="selected-files2"></div>
+            <!-- Display selected file names for Container 2 -->
+          </div>
+        </div>
+      </div>
+
+      <br />
+
+      <button type="submit">Proceed and Download</button>
+    </form>
+    <!-- {% if alert_message %}
+    <script>
+      alert("{{ alert_message }}");
+    </script>
+    {% endif %} -->
+
+    <script>
+      const dropContainer1 = document.getElementById("drop-container");
+      const dropContainer2 = document.getElementById("drop-container2");
+      const fileInput1 = document.getElementById("file-input");
+      const fileInput2 = document.getElementById("file-input2");
+      const selectedFiles1 = document.getElementById("selected-files1"); // Reference to the element for displaying selected file names for Container 1
+      const selectedFiles2 = document.getElementById("selected-files2"); // Reference to the element for displaying selected file names for Container 2
+
+      // Function to update the selected file names for Container 1
+      function updateSelectedFiles1() {
+        selectedFiles1.innerHTML = ""; // Clear previous entries
+        if (fileInput1.files.length > 0) {
+          selectedFiles1.innerHTML = "File Containing All Details:<br>";
+          for (const file of fileInput1.files) {
+            selectedFiles1.innerHTML += file.name + "<br>";
+          }
+        }
+      }
+
+      // Function to update the selected file names for Container 2
+      function updateSelectedFiles2() {
+        selectedFiles2.innerHTML = ""; // Clear previous entries
+        if (fileInput2.files.length > 0) {
+          selectedFiles2.innerHTML = "File Containing Emails:<br>";
+          for (const file of fileInput2.files) {
+            selectedFiles2.innerHTML += file.name + "<br>";
+          }
+        }
+      }
+
+      dropContainer1.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropContainer1.style.border = "2px dashed #007bff";
+      });
+
+      dropContainer2.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropContainer2.style.border = "2px dashed #007bff";
+      });
+
+      dropContainer1.addEventListener("dragleave", () => {
+        dropContainer1.style.border = "2px dashed #ccc";
+      });
+
+      dropContainer2.addEventListener("dragleave", () => {
+        dropContainer2.style.border = "2px dashed #ccc";
+      });
+
+      dropContainer1.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropContainer1.style.border = "2px dashed #ccc";
+        const files = e.dataTransfer.files;
+        fileInput1.files = files;
+        updateSelectedFiles1(); // Update selected file names for Container 1
+      });
+
+      dropContainer2.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropContainer2.style.border = "2px dashed #ccc";
+        const files = e.dataTransfer.files;
+        fileInput2.files = files;
+        updateSelectedFiles2(); // Update selected file names for Container 2
+      });
+
+      fileInput1.addEventListener("change", () => {
+        dropContainer1.style.border = "2px dashed #ccc";
+        updateSelectedFiles1(); // Update selected file names for Container 1
+      });
+
+      fileInput2.addEventListener("change", () => {
+        dropContainer2.style.border = "2px dashed #ccc";
+        updateSelectedFiles2(); // Update selected file names for Container 2
+      });
+    </script>
+  </body>
+</html>
